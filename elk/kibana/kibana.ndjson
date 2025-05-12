@@ -1,0 +1,60 @@
+{
+  "version": "8.11.0",
+  "objects": [
+    {
+      "id": "todo-logs-dashboard",
+      "type": "dashboard",
+      "attributes": {
+        "title": "Todo Application Logs",
+        "description": "Dashboard for monitoring todo application logs",
+        "hits": 0,
+        "timeRestore": false,
+        "panels": [
+          {
+            "id": "todo-logs-count",
+            "type": "visualization",
+            "attributes": {
+              "title": "Todo Operations Count",
+              "visState": {
+                "title": "Todo Operations Count",
+                "type": "metric",
+                "aggs": [
+                  {
+                    "id": "1",
+                    "type": "count",
+                    "schema": "metric"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "todo-logs-timeline",
+            "type": "visualization",
+            "attributes": {
+              "title": "Todo Operations Timeline",
+              "visState": {
+                "title": "Todo Operations Timeline",
+                "type": "line",
+                "aggs": [
+                  {
+                    "id": "1",
+                    "type": "count",
+                    "schema": "metric"
+                  },
+                  {
+                    "id": "2",
+                    "type": "date_histogram",
+                    "schema": "segment",
+                    "field": "@timestamp",
+                    "interval": "auto"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
