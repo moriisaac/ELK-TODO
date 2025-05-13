@@ -8,11 +8,17 @@ services:
     ports:
       - "3000:3000"
     environment:
+      - NODE_ENV=development
       - MONGODB_URI=mongodb://mongodb:27017/todos
+      - RABBITMQ_URL=amqp://rabbitmq:5673 # You can use the default port 5672
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     volumes:
       - ../backend/logs:/usr/src/app/logs
     depends_on:
       - mongodb
+      - redis
+      - rabbitmq
       - elasticsearch
     networks:
       - app-network
@@ -23,6 +29,21 @@ services:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
+    networks:
+      - app-network
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5673:5672"
+      - "15673:15672"
     networks:
       - app-network
 

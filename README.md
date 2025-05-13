@@ -1,34 +1,53 @@
 # StarHub Todo Application
 
-A production-ready todo list application built with NestJS and integrated with ELK Stack for logging visualization.
+A production-ready todo list application built with NestJS and integrated with ELK Stack for comprehensive logging and monitoring.
 
 ## Tech Stack
 
-### Backend (Required)
-- NestJS - Modern, progressive Node.js framework
-- MongoDB - NoSQL database
+### DevOps (Mandatory)
 - Docker - Container platform
+- Kubernetes - Container orchestration
+- Helm - Kubernetes package manager
 - ELK Stack:
   - Elasticsearch - Search and analytics engine
   - Logstash - Log processing pipeline
   - Kibana - Visualization platform
 
+### Backend (Mandatory)
+- NestJS - Modern Node.js framework
+- MongoDB - NoSQL database
+- RabbitMQ - Message broker
+- Redis - In-memory cache
+- Apollo GraphQL - GraphQL server
+
+### Frontend (Optional)
+- React with Next.js
+- SCSS for styling
+- Apollo GraphQL client
+
 ## Project Structure
 ```
 starhub/
 ├── backend/                 # NestJS application
-│   ├── src/                # Source code
-│   │   ├── todo/          # Todo module
+│   ├── src/
+│   │   ├── todo/          # Todo module with GraphQL resolvers
+│   │   ├── schema.gql     # GraphQL schema
+│   │   ├── common/        # Shared utilities
+│   │   │   └── logging/   # Custom JSON logger
 │   │   └── main.ts        # Application entry point
 │   ├── logs/              # Application logs
 │   ├── Dockerfile         # Backend container configuration
 │   └── package.json       # Dependencies and scripts
 ├── docker/
-│   └── docker-compose.yml # Container orchestration
+│   ├── docker-compose.yml # Local development orchestration
+│   └── k8s/               # Kubernetes manifests
+│       └── helm/          # Helm charts
 ├── elk/                   # ELK Stack configuration
 │   ├── elasticsearch/     # Elasticsearch configuration
 │   ├── logstash/         # Logstash pipeline and config
-│   └── kibana/           # Kibana dashboards
+│   └── kibana/           # Kibana dashboards and visualizations
+├── redis/                 # Redis configuration
+├── rabbitmq/             # RabbitMQ configuration
 └── README.md
 ```
 
@@ -37,33 +56,166 @@ starhub/
 ### Prerequisites
 - Docker and Docker Compose installed
 - Node.js 20.x or later (for local development)
+- Kubernetes cluster (for production deployment)
+- Helm 3.x (for production deployment)
 
-### Running with Docker
+### Local Development with Docker
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/moriisaac/ELK-TODO
+git clone https://github.com/moriisaac/ELK-TODO.git
 cd starhub
 ```
 
 2. Start the application stack:
 ```bash
-cd docker
 docker-compose up -d
 ```
 
 This will start:
-- NestJS backend on http://localhost:3000
+- NestJS backend (GraphQL API) on http://localhost:3000
 - MongoDB on localhost:27017
+- Redis on localhost:6379
+- RabbitMQ on localhost:5672 (Management: 15672)
 - Elasticsearch on http://localhost:9200
 - Kibana on http://localhost:5601
-- Logstash for log processing
+- Logstash on localhost:5044
 
-### API Endpoints
+### Production Deployment
 
-The following REST endpoints are available:
+1. Configure Kubernetes cluster:
+```bash
+kubectl apply -f docker/k8s/
+```
 
-- `POST /todos` - Create a new todo
+2. Deploy with Helm:
+```bash
+helm install todo-app docker/k8s/helm/
+```
+
+## Service Architecture
+
+### Backend Services
+
+1. **NestJS Application**
+   - GraphQL API for todo operations
+   - MongoDB for data persistence
+   - Redis for caching and session management
+   - RabbitMQ for event messaging
+   - Winston for JSON logging
+
+2. **MongoDB**
+   - Stores todo items and user data
+   - Replica set ready for production
+
+3. **Redis**
+   - Caches frequently accessed data
+   - Handles session management
+   - Improves API response times
+
+4. **RabbitMQ**
+   - Handles asynchronous operations
+   - Event-driven architecture support
+   - Message queuing for scalability
+
+### Logging Infrastructure
+
+1. **JSON Logging**
+   - Custom Winston logger
+   - Structured log format
+   - Contextual information for each operation
+
+2. **Log Processing**
+   - Logstash ingests logs from application
+   - Custom pipeline for log enrichment
+   - Direct forwarding to Elasticsearch
+
+3. **Log Storage and Analysis**
+   - Elasticsearch indexes all logs
+   - Full-text search capabilities
+   - Time-series data analysis
+
+4. **Visualization**
+   - Kibana dashboard for log analysis
+   - Real-time monitoring
+   - Custom visualizations for CRUD operations
+
+## API Documentation
+
+### GraphQL API
+
+The API is available at `http://localhost:3000/graphql`
+
+#### Queries
+```graphql
+todos: [Todo!]!           # Get all todos
+todo(id: ID!): Todo      # Get a specific todo
+```
+
+#### Mutations
+```graphql
+createTodo(input: CreateTodoInput!): Todo
+updateTodo(id: ID!, input: UpdateTodoInput!): Todo
+deleteTodo(id: ID!): Boolean
+```
+
+### REST Fallback API
+
+Traditional REST endpoints are also available:
+
+- `POST /todos` - Create a todo
+- `GET /todos` - List all todos
+- `GET /todos/:id` - Get a specific todo
+- `PATCH /todos/:id` - Update a todo
+- `DELETE /todos/:id` - Delete a todo
+
+## Monitoring and Visualization
+
+### Accessing Kibana Dashboard
+
+1. Open Kibana at `http://localhost:5601`
+2. Navigate to Dashboard section
+3. Open "Todo Dashboard"
+
+### Available Visualizations
+
+1. **Message Timeline**
+   - Messages per timestamp
+   - Visualizes operation frequency over time
+   - Helps identify peak activity periods
+
+2. **Operation Status**
+   - Count of records per timestamp
+   - Success/Failure distribution
+   - Input record status (true/false)
+
+3. **Event Analysis**
+   - Event type distribution
+   - Operation patterns
+   - System activity overview
+
+2. **Log Level Distribution**
+   - Breakdown of log levels
+   - Error rate monitoring
+   - Warning trends
+
+3. **Activity Timeline**
+   - Operation frequency over time
+   - Peak usage periods
+   - Trend analysis
+
+4. **Request Context Analysis**
+   - Popular API endpoints
+   - Response times
+   - Error patterns
+
+### Dashboard Features
+
+- Real-time updates
+- Time range selection
+- Custom filters
+- Export capabilities
+- Saved searches
 - `GET /todos` - List all todos
 - `GET /todos/:id` - Get a specific todo
 - `PATCH /todos/:id` - Update a todo
@@ -72,9 +224,9 @@ The following REST endpoints are available:
 ### Accessing Kibana Dashboard
 
 1. Open Kibana at http://localhost:5601
-2. Navigate to Management → Stack Management → Saved Objects
+<!-- 2. Navigate to Management → Stack Management → Saved Objects
 3. Import the dashboard configuration from `elk/kibana/kibana.ndjson`
-4. Access the dashboard from the Dashboard menu
+4. Access the dashboard from the Dashboard menu -->
 
 ## Docker Services Explanation
 
@@ -130,11 +282,7 @@ The application uses Docker Compose to orchestrate the following services, each 
    - Port: 27017
 
 3. **Elasticsearch**
-   - **Why Containerized**:
-     - Complex configuration requirements
-     - Resource-intensive service that benefits from isolation
-     - Version consistency critical for ELK stack
-     - Simplified cluster configuration for scaling
+   - Log storage and indexing
    - Port: 9200
 
 4. **Logstash**
