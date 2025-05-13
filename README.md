@@ -108,32 +108,55 @@ The following REST endpoints are available:
 
 ## Architecture
 
-### Docker Services
-The application uses Docker Compose to orchestrate the following services:
+### Docker Services and Containerization Strategy
+
+The application uses Docker Compose to orchestrate the following services, each containerized for specific reasons:
 
 1. **Backend (NestJS)**
+   - **Why Containerized**: 
+     - Ensures consistent Node.js runtime environment across development and production
+     - Isolates application dependencies
+     - Enables easy scaling and deployment
+     - Simplifies CI/CD pipeline integration
    - Custom Node.js-based Dockerfile
-   - Handles todo CRUD operations
-   - Implements JSON logging
    - Port: 3000
 
 2. **MongoDB**
-   - Data persistence for todo items
+   - **Why Containerized**:
+     - Provides data persistence without local installation
+     - Ensures consistent database version
+     - Easy backup and restore through Docker volumes
+     - Simplifies development environment setup
    - Port: 27017
 
 3. **Elasticsearch**
-   - Log storage and indexing
+   - **Why Containerized**:
+     - Complex configuration requirements
+     - Resource-intensive service that benefits from isolation
+     - Version consistency critical for ELK stack
+     - Simplified cluster configuration for scaling
    - Port: 9200
 
 4. **Logstash**
-   - Log collection and processing
-   - Custom pipeline for JSON logs
+   - **Why Containerized**:
+     - Requires specific configuration for log processing
+     - Needs to be version-compatible with Elasticsearch
+     - Pipeline configuration can be version controlled
+     - Easy to modify log processing rules
    - Port: 5044
 
 5. **Kibana**
-   - Log visualization and monitoring
-   - Custom dashboards
+   - **Why Containerized**:
+     - Must match Elasticsearch version
+     - Complex web application with specific dependencies
+     - Configuration can be version controlled
+     - Easy updates and rollbacks
    - Port: 5601
+
+### Container Networking and Communication
+- All services are connected through a Docker network
+- Inter-service communication is secured and isolated
+- Port mapping allows external access only to necessary services
 
 ## Monitoring and Logging
 
