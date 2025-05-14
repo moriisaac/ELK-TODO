@@ -375,3 +375,11 @@ API endpoints are available at http://localhost:3000/api:
 - `GET /todos/:id` - Get a specific todo
 - `PATCH /todos/:id` - Update a todo
 - `DELETE /todos/:id` - Delete a todo
+
+### Testing
+
+1. **Run Tests**
+```bash
+- chmod +x test-crud.sh
+- ./test-crud.sh
+```
