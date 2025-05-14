@@ -282,7 +282,12 @@ The application uses Docker Compose to orchestrate the following services, each 
    - Port: 27017
 
 3. **Elasticsearch**
-   - Log storage and indexing
+   - **Why Containerized**:
+     - Complex configuration requirements (JVM settings, memory limits)
+     - Resource-intensive service that benefits from isolation
+     - Version consistency critical for ELK stack compatibility
+     - Simplified cluster configuration for scaling
+     - Easy management of data persistence through volumes
    - Port: 9200
 
 4. **Logstash**
@@ -347,7 +352,7 @@ docker-compose up -d
 4. **View Logs**
 - Open Kibana (http://localhost:5601)
 - Navigate to Menu → Dashboard
-- Select "Todo Application Monitoring"
+- Select "Todo Dashboard"
 
 ## Development
 
